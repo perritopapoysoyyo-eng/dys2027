@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christmas Countdown 🎄</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at top, #174b37 0%, transparent 65%),
+    linear-gradient(160deg, #061a14, #020b09);
+  color: #f5ead2;
+  font-family: Georgia, serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  text-align: center;
+  padding: 25px 15px;
+}
+
+.snow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.flake {
+  position: absolute;
+  top: -20px;
+  color: white;
+  opacity: .65;
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(110vh) rotate(360deg);
+  }
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 650px;
+  padding: 35px 18px;
+  border: 1px solid rgba(218,185,117,.25);
+  border-radius: 24px;
+  background: rgba(3,20,14,.75);
+  box-shadow: 0 0 50px #0008;
+  backdrop-filter: blur(10px);
+}
+
+.decoration {
+  font-size: 48px;
+  margin-bottom: 18px;
+}
+
+h1 {
+  font-size: clamp(25px, 7vw, 43px);
+  color: #e5c787;
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  color: #b8c8b9;
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin-bottom: 35px;
+}
+
+.label {
+  font-size: 12px;
+  color: #c8a969;
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+}
+
+#counter {
+  font-size: clamp(21px, 6vw, 43px);
+  font-family: monospace;
+  color: #f4e4c0;
+  overflow-wrap: anywhere;
+  text-shadow: 0 0 20px #c6a35b66;
+  line-height: 1.4;
+  margin: 15px 0;
+}
+
+.unit {
+  color: #d9bd82;
+  font-size: 15px;
+  letter-spacing: 4px;
+}
+
+.separator {
+  height: 1px;
+  background: linear-gradient(
+    to right, transparent, #c5a567, transparent
+  );
+  margin: 30px 0;
+}
+
+.message {
+  color: #c6d4c8;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.date {
+  color: #e4c783;
+  font-size: 18px;
+  margin-top: 20px;
+}
+
+.footer {
+  color: #728b7c;
+  font-size: 11px;
+  margin-top: 35px;
+  letter-spacing: 2px;
+}
+
+#status {
+  color: #d7bb7b;
+  font-size: 13px;
+  margin-top: 20px;
+}
+
+.hidden {
+  display: none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="snow" id="snow"></div>
+
+<main class="container">
+
+  <div class="decoration">🎄</div>
+
+  <h1>CHRISTMAS IS COMING</h1>
+
+  <p class="subtitle">
+    THE MOST WONDERFUL TIME OF THE YEAR
+  </p>
+
+  <div id="waiting">
+    <p class="label">PREPÁRATE...</p>
+    <h2 style="color:#e5c787">La magia está por comenzar</h2>
+    <p class="message" style="margin-top:15px">
+      La cuenta regresiva comenzará el<br>
+      24 de noviembre a la 1:00 AM.
+    </p>
+    <div class="date">24 · 11 · 2026</div>
+  </div>
+
+  <div id="countdown" class="hidden">
+
+    <p class="label">EL TIEMPO RESTANTE ES DE...</p>
+
+    <div id="counter">0</div>
+
+    <div class="unit">NANOSEGUNDOS</div>
+
+    <div class="separator"></div>
+
+    <p class="message">
+      Cada nanosegundo nos acerca más
+      a la Navidad.
+    </p>
+
+    <div class="date">
+      ✦ 24 DE DICIEMBRE DE 2026 ✦
+    </div>
+
+  </div>
+
+  <div id="finished" class="hidden">
+    <h2 style="color:#e5c787;font-size:30px">
+      ¡FELIZ NAVIDAD! 🎅
+    </h2>
+    <p class="message" style="margin-top:20px">
+      Finalmente llegó el día más esperado.
+    </p>
+  </div>
+
+  <p id="status">ESPERANDO EL MOMENTO...</p>
+
+  <div class="footer">
+    MADE WITH axolaczel7._8 en tiktok 
+            CHRISTMAS 2026
+  </div>
+
+</main>
+
+<script>
+
+// FECHAS OFICIALES
+// Meses: enero = 0, noviembre = 10, diciembre = 11
+
+const startDate = new Date(2026, 10, 24, 1, 0, 0);
+const endDate   = new Date(2026, 11, 24, 1, 0, 0);
+
+// Elementos
+const waiting = document.getElementById("waiting");
+const countdown = document.getElementById("countdown");
+const finished = document.getElementById("finished");
+const counter = document.getElementById("counter");
+const status = document.getElementById("status");
+
+// Reloj de alta resolución anclado al reloj local
+const initialWallTime = Date.now();
+const initialPerformance = performance.now();
+
+function getCurrentTime() {
+  return initialWallTime +
+    (performance.now() - initialPerformance);
+}
+
+function updateCountdown() {
+
+  const now = getCurrentTime();
+
+  // Antes del inicio
+  if (now < startDate.getTime()) {
+
+    waiting.classList.remove("hidden");
+    countdown.classList.add("hidden");
+    finished.classList.add("hidden");
+
+    status.textContent = "LA CUENTA REGRESIVA AÚN NO COMIENZA";
+    return;
+  }
+
+  // Durante la cuenta regresiva
+  if (now < endDate.getTime()) {
+
+    waiting.classList.add("hidden");
+    countdown.classList.remove("hidden");
+    finished.classList.add("hidden");
+
+    status.textContent = "✦ CUENTA REGRESIVA ACTIVA ✦";
+
+    const remainingMs = endDate.getTime() - now;
+
+    // Convertir milisegundos a nanosegundos
+    const nanoseconds = BigInt(
+      Math.ceil(remainingMs * 1000000)
+    );
+
+    counter.textContent =
+      nanoseconds.toLocaleString("es-MX");
+
+    return;
+  }
+
+  // Navidad llegó
+  waiting.classList.add("hidden");
+  countdown.classList.add("hidden");
+  finished.classList.remove("hidden");
+
+  status.textContent = "¡LLEGÓ EL MOMENTO!";
+}
+
+setInterval(updateCountdown, 10);
+updateCountdown();
+
+// Nieve decorativa
+const snow = document.getElementById("snow");
+
+for (let i = 0; i < 45; i++) {
+
+  const flake = document.createElement("div");
+
+  flake.className = "flake";
+  flake.textContent = "❄";
+
+  flake.style.left = Math.random() * 100 + "%";
+  flake.style.fontSize =
+    (Math.random() * 12 + 7) + "px";
+
+  flake.style.animationDuration =
+    (Math.random() * 8 + 6) + "s";
+
+  flake.style.animationDelay =
+    (Math.random() * 10) + "s";
+
+  snow.appendChild(flake);
+}
+
+</script>
+
+</body>
+</html>
